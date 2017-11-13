@@ -23,20 +23,38 @@ class App extends Component {
     };
   }
 
+  servingFromRight() {
+    const playerIndex = this.state.serverHistory[this.state.serverHistory.length - 1] || 0;
+    const score = this.state.players[playerIndex].score;
+    return score % 2 == 0;
+  }
+
   render() {
-    let names = ['', this.state.players[1].name, this.state.players[0].name, ''];
+    let names;
+    if (this.servingFromRight()) {
+      names = ['', this.state.players[1].name,
+        this.state.players[0].name, ''];
+    } else {
+      names = [this.state.players[0].name, '',
+        '', this.state.players[1].name];
+    }
+
+    const boxStyle = (text) => {
+      return { background: text ? 'lightgreen' : 'null' }
+    }
+
     return (
       <div>
         <div className="score-container">
           <div className="score">{this.state.players[0].score}</div>
           <div>
             <div className="court-row">
-              <div className="box">{names[0]}</div>
-              <div className="box">{names[1]}</div>
+              <div className="box" style={boxStyle(names[0])}>{names[0]}</div>
+              <div className="box" style={boxStyle(names[1])}>{names[1]}</div>
             </div>
             <div className="court-row">
-              <div className="box">{names[2]}</div>
-              <div className="box">{names[3]}</div>
+              <div className="box" style={boxStyle(names[2])}>{names[2]}</div>
+              <div className="box" style={boxStyle(names[3])}>{names[3]}</div>
             </div>
           </div>
           <div className="score">{this.state.players[1].score}</div>
