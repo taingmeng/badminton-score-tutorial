@@ -114,7 +114,7 @@ class App extends Component {
     }
 
     const boxStyle = (text) => {
-      return { background: text ? 'lightgreen' : 'null' }
+      return { background: text ? 'lightgreen' : 'transparent' }
     }
 
     return (
