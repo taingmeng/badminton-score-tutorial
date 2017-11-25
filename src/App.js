@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
+import annyang from './Annyang'
 
 class App extends Component {
   constructor() {
@@ -21,6 +22,79 @@ class App extends Component {
       voiceStatus: 'hello',
       voiceInput: ['hello world', 'halo war', 'hallow world']
     };
+  }
+
+  componentDidMount() {
+    annyang.addCommands(this.reset, this.change, this.undo)
+    annyang.addCallback(this.engineCallback, this.resultCallback)
+    annyang.start()
+
+    this.setState({
+      voiceStatus: annyang.isSupported() ? 'Supported' : 'Unsupported'
+    })
+  }
+
+  componentWillUnmount() {
+    annyang.abort()
+  }
+
+  engineCallback = (status) => {
+    this.setState({
+      voiceStatus: status
+    })
+  }
+
+  resultCallback = (voiceInput) => {
+    this.setState({
+      voiceInput: voiceInput
+    })
+    voiceInput.some(phrase => {
+      return this.state.players.some((player, playerIndex) => {
+        if (player.commands.map(command => command.toLowerCase()).includes(phrase.trim().toLowerCase())) {
+          this.increaseScore(playerIndex)
+          return true
+        }
+        return false
+      })
+    })
+  }
+
+  increaseScore(playerIndex) {
+    const players = this.state.players.slice()
+    players[playerIndex].score += 1
+    this.setState({
+      players: players,
+      serverHistory: [...this.state.serverHistory, playerIndex]
+    })
+  }
+
+  reset = () => {
+    const players = this.state.players.slice()
+    players.forEach(player => player.score = 0)
+    this.setState({
+      players: players,
+      serverHistory: []
+    })
+  }
+
+  change = () => {
+    this.setState({
+      players: this.state.players.reverse()
+    })
+  }
+
+  undo = () => {
+    const serverHistory = this.state.serverHistory
+    if (serverHistory.length == 0) {
+      return
+    }
+    const lastServerIndex = serverHistory[serverHistory.length - 1]
+    const players = this.state.players.slice()
+    players[lastServerIndex].score -= 1
+    this.setState({
+      players: players,
+      serverHistory: serverHistory.slice(0, -1)
+    })
   }
 
   servingFromRight() {
